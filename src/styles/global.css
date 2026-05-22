@@ -1,0 +1,123 @@
+*, *::before, *::after { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
+
+:root {
+  --bg: #0a0d0a;
+  --surface: #111511;
+  --card: #161b16;
+  --border: #1f261f;
+  --green: #39ff6a;
+  --green-dim: #1a7a36;
+  --green-glow: rgba(57, 255, 106, 0.18);
+  --red: #ff4d6d;
+  --red-glow: rgba(255, 77, 109, 0.18);
+  --muted: #4a5e4a;
+  --text: #d4e8d4;
+  --text-dim: #7a9c7a;
+  --font-head: 'Rajdhani', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app { 
+  min-height: 100vh;
+  display: flex; 
+  flex-direction: column; 
+}
+
+::-webkit-scrollbar { 
+  width: 4px; 
+}
+
+::-webkit-scrollbar-track { 
+  background: var(--surface); 
+}
+
+::-webkit-scrollbar-thumb { 
+  background: var(--green-dim); border-radius: 2px; 
+}
+
+h1, h2, h3, .font-head {
+  font-family: var(--font-head);
+  letter-spacing: 1px;
+}
+
+.fade-enter-active, .fade-leave-active { 
+  transition: opacity .2s ease; 
+}
+
+.fade-enter-from, .fade-leave-to { 
+  opacity: 0; 
+}
+
+.slide-up-enter-active { 
+  transition: all .25s ease; 
+}
+
+.slide-up-enter-from   { 
+  opacity: 0; 
+  transform: translateY(12px); 
+}
+
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 12px var(--green-glow); 
+  }
+
+  50% { 
+    box-shadow: 0 0 28px rgba(57, 255, 106, .35); 
+  }
+}
+.glow-active { 
+  animation: glow-pulse 2s ease-in-out infinite; 
+}
+
+.view {
+  flex: 1;
+  padding: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.grid-2 { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 16px; 
+}
+
+.grid-3 { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 16px; 
+}
+
+@media (max-width: 600px) {
+  .grid-2 { 
+    grid-template-columns: 1fr; 
+  }
+
+  .grid-3 { 
+    grid-template-columns: 1fr 1fr; 
+  }
+  
+  .view { 
+    padding: 16px; 
+  }
+}
