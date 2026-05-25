@@ -1,4 +1,5 @@
 <template>
+  <!-- Campo de formulário reutilizável que suporta input e select. -->
   <div class="field">
     <label v-if="label" class="field-label">{{ label }}</label>
     <component
@@ -15,33 +16,51 @@
 </template>
 
 <script setup>
-import { useAttrs } from 'vue'
+  import { useAttrs } from 'vue'
 
-defineProps({
-  modelValue: [String, Number],
-  label:      String,
-  type:       { type: String, default: 'text' },
-})
-defineEmits(['update:modelValue'])
+  // Propriedades que controlam o valor, rótulo e tipo do campo.
+  defineProps({
+    modelValue: [String, Number],
+    label:      String,
+    type:       { type: String, default: 'text' },
+  })
+  defineEmits(['update:modelValue'])
 
-const attrs = useAttrs()
+  // Captura atributos adicionais passados ao componente.
+  const attrs = useAttrs()
 </script>
 
 <style scoped>
-.field { display: flex; flex-direction: column; gap: 6px; }
-.field-label { font-size: .78rem; color: var(--text-dim); letter-spacing: .5px; }
-.field-input {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: .9rem;
-  padding: 10px 14px;
-  outline: none;
-  transition: border .2s;
-  width: 100%;
-}
-.field-input:focus { border-color: var(--green-dim); }
-option { background: var(--card); }
+  .field { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px; 
+  }
+
+  .field-label { 
+    font-size: .78rem; 
+    color: var(--text-dim); 
+    letter-spacing: .5px; 
+  }
+
+  .field-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: .9rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border .2s;
+    width: 100%;
+  }
+
+  .field-input:focus { 
+    border-color: var(--green-dim); 
+  }
+
+  option { 
+    background: var(--card); 
+  }
 </style>

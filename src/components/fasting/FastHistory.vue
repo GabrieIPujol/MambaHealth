@@ -1,4 +1,5 @@
 <template>
+  <!-- Lista de registros de jejum com animação de entrada. -->
   <div>
     <p v-if="!items.length" class="empty">Nenhum jejum registrado ainda.</p>
     <TransitionGroup name="slide-up" tag="div" class="list">
@@ -19,28 +20,29 @@
 </template>
 
 <script setup>
-import TagBadge from '@/components/ui/TagBadge.vue'
-import { useTimer } from '@/composables/useTimer'
+  import TagBadge from '@/components/ui/TagBadge.vue'
+  import { useTimer } from '@/composables/useTimer'
 
-const { formatDuration } = useTimer()
-defineProps({ items: { type: Array, default: () => [] } })
+  // Utilitário de formatação de tempo para exibir duração dos jejuns.
+  const { formatDuration } = useTimer()
+  defineProps({ items: { type: Array, default: () => [] } })
 </script>
 
 <style scoped>
-.empty { color: var(--text-dim); font-size: .85rem; text-align: center; padding: 24px 0; }
-.list  { display: flex; flex-direction: column; gap: 8px; }
+  .empty { color: var(--text-dim); font-size: .85rem; text-align: center; padding: 24px 0; }
+  .list  { display: flex; flex-direction: column; gap: 8px; }
 
-.item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px; border-radius: var(--radius-sm);
-  border: 1px solid var(--border); background: var(--surface);
-}
-.item-label { font-size: .85rem; }
-.item-meta  { font-size: .75rem; color: var(--text-dim); margin-top: 2px; }
-.item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-.item-val   { font-family: var(--font-head); font-size: 1rem; font-weight: 600; color: var(--green); }
+  .item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--surface);
+  }
+  .item-label { font-size: .85rem; }
+  .item-meta  { font-size: .75rem; color: var(--text-dim); margin-top: 2px; }
+  .item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+  .item-val   { font-family: var(--font-head); font-size: 1rem; font-weight: 600; color: var(--green); }
 
-/* transition */
-.slide-up-enter-active { transition: all .25s ease; }
-.slide-up-enter-from   { opacity: 0; transform: translateY(8px); }
+  /* transition */
+  .slide-up-enter-active { transition: all .25s ease; }
+  .slide-up-enter-from   { opacity: 0; transform: translateY(8px); }
 </style>

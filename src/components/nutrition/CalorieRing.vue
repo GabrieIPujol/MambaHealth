@@ -1,6 +1,6 @@
 <template>
+  <!-- Anel de consumo calórico com percentual e informações de meta. -->
   <div class="cal-wrap">
-    <!-- SVG ring -->
     <div class="svg-wrap">
       <svg width="120" height="120" viewBox="0 0 120 120" style="transform:rotate(-90deg)">
         <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="8" />
@@ -21,7 +21,6 @@
       </div>
     </div>
 
-    <!-- Info -->
     <div class="info">
       <div class="info-row">
         <span class="info-big" :class="{ over }">{{ consumed }}</span>
@@ -36,38 +35,91 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+  import { computed } from 'vue'
 
-const props = defineProps({
-  consumed: { type: Number, default: 0 },
-  goal:     { type: Number, default: 2000 },
-})
+  // Propriedades de consumo e meta usadas para calcular o anel.
+  const props = defineProps({
+    consumed: { type: Number, default: 0 },
+    goal: { type: Number, default: 2000 },
+  })
 
-const pct    = computed(() => Math.round(props.consumed / props.goal * 100))
-const over   = computed(() => pct.value > 100)
-const circ   = 2 * Math.PI * 50
-const offset = computed(() => circ - (Math.min(pct.value, 100) / 100) * circ)
+  const pct = computed(() => Math.round(props.consumed / props.goal * 100))
+  const over = computed(() => pct.value > 100)
+  const circ = 2 * Math.PI * 50
+  const offset = computed(() => circ - (Math.min(pct.value, 100) / 100) * circ)
 </script>
 
 <style scoped>
-.cal-wrap  { display: flex; align-items: center; gap: 20px; }
-.svg-wrap  { position: relative; flex-shrink: 0; }
-.svg-center {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-}
-.pct-val {
-  font-family: var(--font-head); font-size: 1.6rem;
-  font-weight: 700; color: var(--green);
-}
-.pct-val.over { color: var(--red); }
+  .cal-wrap { 
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+  }
 
-.info        { flex: 1; }
-.info-row    { display: flex; align-items: baseline; gap: 4px; }
-.info-big    { font-family: var(--font-head); font-size: 2.4rem; font-weight: 700; color: var(--green); line-height: 1; }
-.info-big.over { color: var(--red); }
-.info-unit   { font-size: .8rem; color: var(--text-dim); }
-.info-goal   { font-size: .8rem; color: var(--text-dim); margin-top: 4px; }
-.info-remaining { font-size: .8rem; color: var(--text-dim); margin-top: 8px; }
-.info-remaining.over { color: var(--red); }
+  .svg-wrap { 
+    position: relative; 
+    flex-shrink: 0; 
+  }
+
+  .svg-center {
+    position: absolute; 
+    inset: 0;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+  }
+
+  .pct-val {
+    font-family: var(--font-head); 
+    font-size: 1.6rem;
+    font-weight: 700; 
+    color: var(--green);
+  }
+
+  .pct-val.over { 
+    color: var(--red); 
+  }
+
+  .info { 
+    flex: 1; 
+  }
+
+  .info-row { 
+    display: flex; 
+    align-items: baseline; 
+    gap: 4px; 
+  }
+
+  .info-big { 
+    font-family: var(--font-head); 
+    font-size: 2.4rem; 
+    font-weight: 700; 
+    color: var(--green); 
+    line-height: 1; 
+  }
+
+  .info-big.over { 
+    color: var(--red); 
+  }
+
+  .info-unit { 
+    font-size: .8rem; 
+    color: var(--text-dim); 
+  }
+
+  .info-goal { 
+    font-size: .8rem; 
+    color: var(--text-dim); 
+    margin-top: 4px; 
+  }
+
+  .info-remaining { 
+    font-size: .8rem; 
+    color: var(--text-dim); 
+    margin-top: 8px; 
+  }
+
+  .info-remaining.over { 
+    color: var(--red); 
+  }
 </style>

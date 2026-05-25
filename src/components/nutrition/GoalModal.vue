@@ -1,4 +1,5 @@
 <template>
+  <!-- Modal de configuração de meta que é teleportado para o body. -->
   <Teleport to="body">
     <Transition name="fade">
       <div v-if="open" class="overlay" @click.self="$emit('close')">
@@ -32,8 +33,10 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'save'])
 
+// Estado local do modal usada para edição antes de salvar.
 const local = reactive({ goal: 2000, p: 150, c: 200, f: 65 })
 
+// Inicializa o formulário local sempre que o modal é aberto.
 watch(() => props.open, (v) => {
   if (v) {
     local.goal = props.goal
@@ -43,26 +46,39 @@ watch(() => props.open, (v) => {
   }
 })
 
+// Emite os valores atualizados para a view pai.
 function save() {
   emit('save', { goal: Number(local.goal), macros: { p: Number(local.p), c: Number(local.c), f: Number(local.f) } })
 }
 </script>
 
 <style scoped>
-.overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.7);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 200; backdrop-filter: blur(4px);
-}
-.modal {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 16px; padding: 28px;
-  width: min(420px, 90vw);
-  display: flex; flex-direction: column; gap: 14px;
-}
-.modal-title {
-  font-family: var(--font-head); font-size: 1.2rem;
-  font-weight: 700; letter-spacing: 1px;
-}
+  .overlay {
+    position: fixed; 
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    z-index: 200; 
+    backdrop-filter: blur(4px);
+  }
+
+  .modal {
+    background: var(--card); 
+    border: 1px solid var(--border);
+    border-radius: 16px; 
+    padding: 28px;
+    width: min(420px, 90vw);
+    display: flex; 
+    flex-direction: column; 
+    gap: 14px;
+  }
+
+  .modal-title {
+    font-family: var(--font-head); 
+    font-size: 1.2rem;
+    font-weight: 700; 
+    letter-spacing: 1px;
+  }
 </style>

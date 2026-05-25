@@ -1,9 +1,11 @@
 import { onUnmounted } from 'vue'
 import Chart from 'chart.js/auto'
 
+// Composable para criar e gerenciar instâncias de gráficos Chart.js.
 export function useChart() {
   const instances = new Map()
 
+  // Configurações base padrão para todos os gráficos.
   const baseOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -31,6 +33,7 @@ export function useChart() {
     },
   }
 
+  // Cria um gráfico em um canvas e substitui instâncias antigas, se houver.
   function create(canvas, config) {
     if (!canvas) return
     const key = canvas
@@ -48,10 +51,12 @@ export function useChart() {
     return inst
   }
 
+  // Destrói um gráfico existente e remove do mapa.
   function destroy(canvas) {
     if (instances.has(canvas)) { instances.get(canvas).destroy(); instances.delete(canvas) }
   }
 
+  // Ao desmontar o componente, destrói todos os gráficos criados.
   onUnmounted(() => instances.forEach(i => i.destroy()))
 
   return { create, destroy, baseOptions }

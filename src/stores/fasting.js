@@ -1,6 +1,8 @@
+// Store de Jejum intermitente com estado reativo e persistência local.
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
+// Protocolos de jejum disponíveis no aplicativo.
 const PROTOCOLS = [
   { id: '16-8', label: '16:8', hours: 16, desc: 'Leão — 16h jejum / 8h alimentação' },
   { id: '18-6', label: '18:6', hours: 18, desc: 'Guerreiro — 18h jejum / 6h alimentação' },
@@ -8,48 +10,55 @@ const PROTOCOLS = [
   { id: 'custom', label: 'Customizado', hours: null, desc: 'Defina suas horas' },
 ]
 
+// Auxiliares para carregar e salvar dados no localStorage.
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch { return d } }
 const persist = (k, v) => localStorage.setItem(k, JSON.stringify(v))
 
+// Retorna string de data atual no formato YYYY-MM-DD.
 const todayStr = () => new Date().toISOString().slice(0, 10)
+
+// Formata uma data para rótulo curto em pt-BR.
 const dayLabel = d => {
   const dt = new Date(d + 'T12:00:00')
   return dt.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })
 }
 
 export const useFastingStore = defineStore('fasting', () => {
-  /* ── persisted state ── */
+  // Carrega estado salvo de jejum ou usa valores padrão.
   const saved = load('mb_fasting', {})
 
-  const active       = ref(saved.active       ?? false)
-  const startTime    = ref(saved.startTime     ?? null)
-  const elapsed      = ref(saved.elapsed       ?? 0)
-  const protocolId   = ref(saved.protocolId    ?? '16-8')
-  const customHours  = ref(saved.customHours   ?? 16)
-  const history      = ref(load('mb_fast_history', []))
+  const active = ref(saved.active ?? false)
+  const startTime = ref(saved.startTime ?? null)
+  const elapsed = ref(saved.elapsed ?? 0)
+  const protocolId = ref(saved.protocolId ?? '16-8')
+  const customHours = ref(saved.customHours ?? 16)
+  const history = ref(load('mb_fast_history', []))
 
-  /* ── computed ── */
+  // Protocol selecionado com base no id.
   const protocol = computed(() => PROTOCOLS.find(p => p.id === protocolId.value) ?? PROTOCOLS[0])
 
+  // Calcula o tempo alvo em segundos para o protocolo atual.
   const targetSeconds = computed(() => {
     const h = protocolId.value === 'custom' ? customHours.value : protocol.value.hours
     return (h ?? 16) * 3600
   })
 
+  // Porcentagem do anel de progresso.
   const ringPct = computed(() => Math.min(100, Math.round(elapsed.value / targetSeconds.value * 100)))
 
+  // Histórico dos últimos 7 dias.
   const recentHistory = computed(() => {
     const cutoff = new Date()
     cutoff.setDate(cutoff.getDate() - 7)
     return history.value.filter(f => new Date(f.date) >= cutoff)
   })
 
-  /* ── estado de conclusão automática ── */
+  // Flag para mostrar notificação de conclusão.
   const justCompleted = ref(false)
 
-  /* ── timer ── */
   let _interval = null
 
+  // Inicia o temporizador que atualiza o elapsed enquanto o jejum está ativo.
   function _startInterval() {
     if (_interval) return
     _interval = setInterval(() => {
@@ -57,7 +66,6 @@ export const useFastingStore = defineStore('fasting', () => {
       elapsed.value = Math.floor((Date.now() - startTime.value) / 1000)
       _save()
 
-      // auto-finaliza ao atingir a meta
       if (elapsed.value >= targetSeconds.value) {
         clearInterval(_interval)
         _interval = null
@@ -67,6 +75,7 @@ export const useFastingStore = defineStore('fasting', () => {
     }, 1000)
   }
 
+  // Salva o estado atual do jejum no localStorage.
   function _save() {
     persist('mb_fasting', {
       active: active.value,
@@ -77,7 +86,7 @@ export const useFastingStore = defineStore('fasting', () => {
     })
   }
 
-  /* ── actions ── */
+  // Inicia um novo jejum.
   function start() {
     active.value = true
     elapsed.value = 0
@@ -86,6 +95,7 @@ export const useFastingStore = defineStore('fasting', () => {
     _startInterval()
   }
 
+  // Finaliza o jejum atual e grava o histórico.
   function stop() {
     const completed = elapsed.value >= targetSeconds.value
     const label = protocolId.value === 'custom'
@@ -107,17 +117,20 @@ export const useFastingStore = defineStore('fasting', () => {
     _save()
   }
 
+  // Seleciona um novo protocolo somente quando o jejum não está ativo.
   function selectProtocol(id) {
     if (active.value) return
     protocolId.value = id
     _save()
   }
 
+  // Limpa o histórico de jejum armazenado.
   function clearHistory() {
     history.value = []
     persist('mb_fast_history', [])
   }
 
+  // Retoma o temporizador se o jejum já estiver em andamento ao montar a view.
   function resumeIfActive() {
     if (active.value && startTime.value) {
       elapsed.value = Math.floor((Date.now() - startTime.value) / 1000)

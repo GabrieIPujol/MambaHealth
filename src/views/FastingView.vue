@@ -1,6 +1,6 @@
 <template>
   <main class="view">
-    <!-- Toast de conclusão -->
+    <!-- Mensagem temporária que aparece quando um jejum foi concluído. -->
     <Transition name="toast">
       <div v-if="store.justCompleted" class="toast" @click="store.justCompleted = false">
         <span class="toast-icon">🏆</span>
@@ -12,7 +12,7 @@
       </div>
     </Transition>
 
-    <!-- Timer card -->
+    <!-- Cartão principal com o controle do temporizador de jejum. -->
     <BaseCard title="⏱ Controle de Jejum" :glow="store.active">
       <RingTimer
         :pct="store.ringPct"
@@ -20,15 +20,21 @@
         :sub="store.active ? 'EM JEJUM' : 'PARADO'"
       />
 
-      <div class="grid-3" style="margin-bottom:16px">
+      <!-- Estatísticas de meta, progresso e tempo restante. -->
+      <div class="grid-3" style="margin-bottom: 16px">
         <StatPill :value="formatDuration(store.targetSeconds)" label="Meta" />
-        <StatPill :value="store.ringPct + '%'"                 label="Progresso" />
+        <StatPill :value="store.ringPct + '%'" label="Progresso" />
         <StatPill
-          :value="store.active ? formatDuration(Math.max(0, store.targetSeconds - store.elapsed)) : '—'"
+          :value="
+            store.active
+              ? formatDuration(Math.max(0, store.targetSeconds - store.elapsed))
+              : '—'
+          "
           label="Restante"
         />
       </div>
 
+      <!-- Botão para iniciar ou finalizar o jejum, dependendo do estado. -->
       <BaseButton v-if="!store.active" variant="green" full @click="store.start">
         INICIAR JEJUM →
       </BaseButton>
@@ -37,7 +43,7 @@
       </BaseButton>
     </BaseCard>
 
-    <!-- Protocol -->
+    <!-- Seleção do protocolo de jejum. -->
     <BaseCard title="⚙ Protocolo">
       <ProtocolSelector
         v-model="store.protocolId"
@@ -47,10 +53,15 @@
       />
     </BaseCard>
 
-    <!-- History -->
+    <!-- Histórico do jejum com opção de limpar o registro. -->
     <BaseCard title="📋 Histórico de Jejuns">
       <template #actions>
-        <BaseButton v-if="store.history.length" variant="outline" sm @click="store.clearHistory">
+        <BaseButton
+          v-if="store.history.length"
+          variant="outline"
+          sm
+          @click="store.clearHistory"
+        >
           Limpar
         </BaseButton>
       </template>
@@ -60,40 +71,78 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { useFastingStore } from '@/stores/fasting'
-import { useTimer } from '@/composables/useTimer'
+  // Importa lifecycle hook para executar ações ao montar a view.
+  import { onMounted } from "vue";
+  // Importa a store de jejum para acessar estado e ações.
+  import { useFastingStore } from "@/stores/fasting";
+  // Importa helper de formatação de tempo.
+  import { useTimer } from "@/composables/useTimer";
 
-import BaseCard         from '@/components/ui/BaseCard.vue'
-import BaseButton       from '@/components/ui/BaseButton.vue'
-import StatPill         from '@/components/ui/StatPill.vue'
-import RingTimer        from '@/components/fasting/RingTimer.vue'
-import ProtocolSelector from '@/components/fasting/ProtocolSelector.vue'
-import FastHistory      from '@/components/fasting/FastHistory.vue'
+  import BaseCard from "@/components/ui/BaseCard.vue";
+  import BaseButton from "@/components/ui/BaseButton.vue";
+  import StatPill from "@/components/ui/StatPill.vue";
+  import RingTimer from "@/components/fasting/RingTimer.vue";
+  import ProtocolSelector from "@/components/fasting/ProtocolSelector.vue";
+  import FastHistory from "@/components/fasting/FastHistory.vue";
 
-const store = useFastingStore()
-const { formatDuration } = useTimer()
+  // Instancia a store e os utilitários usados no template.
+  const store = useFastingStore();
+  const { formatDuration } = useTimer();
 
-onMounted(() => store.resumeIfActive())
+  // Se um jejum estava ativo ao recarregar a página, retoma o temporizador.
+  onMounted(() => store.resumeIfActive());
 </script>
 
 <style scoped>
-/* ── TOAST ── */
-.toast {
-  display: flex; align-items: center; gap: 14px;
-  padding: 16px 20px; border-radius: var(--radius);
-  background: #0d2e18;
-  border: 1px solid var(--green-dim);
-  box-shadow: 0 0 24px var(--green-glow);
-  cursor: pointer;
-}
-.toast-icon  { font-size: 1.6rem; flex-shrink: 0; }
-.toast-title { font-family: var(--font-head); font-size: 1rem; font-weight: 700; color: var(--green); letter-spacing: 1px; }
-.toast-sub   { font-size: .8rem; color: var(--text-dim); margin-top: 2px; }
-.toast-close { margin-left: auto; color: var(--muted); font-size: .9rem; flex-shrink: 0; }
+  .toast {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    background: #0d2e18;
+    border: 1px solid var(--green-dim);
+    box-shadow: 0 0 24px var(--green-glow);
+    cursor: pointer;
+  }
 
-.toast-enter-active { transition: all .35s cubic-bezier(.34,1.56,.64,1); }
-.toast-leave-active { transition: all .2s ease; }
-.toast-enter-from   { opacity: 0; transform: translateY(-12px) scale(.97); }
-.toast-leave-to     { opacity: 0; transform: translateY(-8px); }
+  .toast-icon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+
+  .toast-title {
+    font-family: var(--font-head);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 1px;
+  }
+
+  .toast-sub {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .toast-close {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .toast-enter-active {
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .toast-leave-active {
+    transition: all 0.2s ease;
+  }
+  .toast-enter-from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+  }
+  .toast-leave-to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 </style>
